@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math"
+	"os"
 )
 
 type InvalidInterestError float64
@@ -19,16 +21,21 @@ type Financing struct {
 	InstallmentCost float64
 }
 
+var DFINANCE_DIR string = fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".dfinance")
+
 func main() {
-	f, err := CreateFinancing(1000, 12, 1.1)
-	if err != nil {
-		fmt.Println("Error while creating financing:", err)
-		return
+	createDFinanceHome()
+}
+
+func createDFinanceHome() {
+	err := os.Mkdir(DFINANCE_DIR, 0750)
+	if err != nil && !os.IsExist(err) {
+		log.Fatal(err)
+	} else if err != nil && os.IsExist(err) {
+		log.Default().Printf("DFinance home already exists.")
+	} else {
+		log.Default().Printf("DFinance home created at %v", DFINANCE_DIR)
 	}
-
-	fmt.Println(f.FutureValue)
-	fmt.Println(f.InstallmentCost)
-
 }
 
 func CreateFinancing(cost float64, installmentCount uint16, interest float64) (*Financing, error) {
